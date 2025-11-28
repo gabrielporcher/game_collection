@@ -98,10 +98,11 @@ export const fetchPlatforms = async (): Promise<PlatformGroup[]> => {
   return groupPlatforms(response.data);
 };
 
-// FETCH GAMES (AGORA ACEITA ARRAY DE PLATAFORMAS)
+// FETCH GAMES (AGORA ACEITA ARRAY DE PLATAFORMAS E BUSCA POR NOME)
 export const fetchGames = async (
   genreId?: number | null,
-  platformIds?: number[] | null
+  platformIds?: number[] | null,
+  searchQuery?: string
 ): Promise<Game[]> => {
   const token = await getAccessToken();
   if (!token) throw new Error("No access token available");
@@ -120,6 +121,11 @@ export const fetchGames = async (
 
   if (platformIds && platformIds.length > 0) {
     conditions.push(`platforms = (${platformIds.join(",")})`);
+  }
+
+  if (searchQuery && searchQuery.trim().length > 0) {
+    // Case insensitive search using IGDB syntax
+    conditions.push(`name ~ "${searchQuery}"*`);
   }
 
   if (conditions.length > 0) {
