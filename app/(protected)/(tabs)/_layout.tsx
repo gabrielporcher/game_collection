@@ -1,40 +1,52 @@
 import React from "react";
 import { Tabs } from "expo-router";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { Ionicons } from "@expo/vector-icons";
+import { Colors } from "@/src/constants/Colors";
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "blue",
-        tabBarInactiveTintColor: "gray",
+        tabBarActiveTintColor: Colors.dark.primary,
+        tabBarInactiveTintColor: Colors.dark.textSecondary,
+        tabBarStyle: {
+          backgroundColor: Colors.dark.surface,
+          borderTopColor: Colors.dark.border,
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "500",
+        },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Games",
+          title: "Jogos",
           tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="" color={color} />
+            <Ionicons size={24} name="game-controller" color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="library"
         options={{
-          title: "Library",
+          title: "Biblioteca",
           tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="" color={color} />
+            <Ionicons size={24} name="library" color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="config"
         options={{
-          title: "Config",
+          title: "Configurações",
           tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="" color={color} />
+            <Ionicons size={24} name="settings" color={color} />
           ),
         }}
       />

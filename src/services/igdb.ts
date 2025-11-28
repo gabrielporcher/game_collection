@@ -11,6 +11,7 @@ export interface Game {
     url: string;
   };
   rating?: number;
+  platforms?: number[];
 }
 
 export interface Genre {
@@ -30,7 +31,7 @@ export interface PlatformGroup {
   platforms: Platform[];
 }
 
-const PLATFORM_GROUPS: Record<string, number[]> = {
+export const PLATFORM_GROUPS: Record<string, number[]> = {
   playstation: [7, 8, 9, 48, 167], // PS1 → PS5
   xbox: [11, 12, 49, 169], // Xbox → Series X|S
   nintendo: [4, 18, 21, 130, 508, 5, 41], // N64, NES, GameCube, Switch...
@@ -125,7 +126,7 @@ export const fetchGames = async (
 
   if (searchQuery && searchQuery.trim().length > 0) {
     // Case insensitive search using IGDB syntax
-    conditions.push(`name ~ "${searchQuery}"*`);
+    conditions.push(`name ~ *"${searchQuery}"*`);
   }
 
   if (conditions.length > 0) {
