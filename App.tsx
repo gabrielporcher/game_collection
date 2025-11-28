@@ -1,74 +1,135 @@
-
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, FlatList, Image, SafeAreaView, StatusBar, ActivityIndicator, TouchableOpacity } from 'react-native';
-import { fetchGames, fetchGenres, Game, Genre } from './services/igdb';
+import {
+  StyleSheet, Text, View, FlatList, Image, SafeAreaView,
+  StatusBar, ActivityIndicator, TouchableOpacity
+} from 'react-native';
+
+import {
+  fetchGames,
+  fetchGenres,
+  fetchPlatforms,
+  Game,
+  Genre,
+  PlatformGroup
+} from './services/igdb';
+
+type FilterType = 'GENRE' | 'PLATFORM';
 
 export default function App() {
   const [games, setGames] = useState<Game[]>([]);
   const [genres, setGenres] = useState<Genre[]>([]);
+  const [platformGroups, setPlatformGroups] = useState<PlatformGroup[]>([]);
+
   const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
+  const [selectedPlatformGroup, setSelectedPlatformGroup] = useState<string | null>(null);
+
+  const [activeFilterType, setActiveFilterType] = useState<FilterType>('GENRE');
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // INITIAL LOAD
   useEffect(() => {
-    loadInitialData();
+    loadInitial();
   }, []);
 
-  const loadInitialData = async () => {
+  const loadInitial = async () => {
     try {
       setLoading(true);
-      setError(null);
-      const [gamesData, genresData] = await Promise.all([
+      const [gamesData, genresData, platformsData] = await Promise.all([
         fetchGames(),
-        fetchGenres()
+        fetchGenres(),
+        fetchPlatforms()
       ]);
       setGames(gamesData);
       setGenres(genresData);
-    } catch (err) {
-      setError('Failed to load data. Please check your connection.');
+      setPlatformGroups(platformsData);
+    } catch {
+      setError('Failed to load data.');
     } finally {
       setLoading(false);
     }
   };
 
-  const loadGames = async (genreId?: number | null) => {
+  const loadGames = async (
+    genreId?: number | null,
+    platformGroupKey?: string | null
+  ) => {
     try {
       setLoading(true);
-      setError(null);
-      const data = await fetchGames(genreId || undefined);
+
+      const platformIds =
+        platformGroupKey
+          ? platformGroups.find(g => g.groupKey === platformGroupKey)?.ids || []
+          : [];
+
+      const data = await fetchGames(
+        genreId !== undefined ? genreId : selectedGenre,
+        platformGroupKey !== undefined
+          ? platformIds
+          : selectedPlatformGroup
+            ? platformGroups.find(g => g.groupKey === selectedPlatformGroup)?.ids || []
+            : []
+      );
+
       setGames(data);
-    } catch (err) {
+    } catch {
       setError('Failed to load games.');
     } finally {
       setLoading(false);
     }
   };
 
+  // GENRE FILTER
   const handleGenreSelect = (genreId: number) => {
     const newGenre = selectedGenre === genreId ? null : genreId;
     setSelectedGenre(newGenre);
-    loadGames(newGenre);
+    loadGames(newGenre, selectedPlatformGroup);
+  };
+
+  // PLATFORM GROUP FILTER
+  const handlePlatformGroupSelect = (groupKey: string) => {
+    const newGroup = selectedPlatformGroup === groupKey ? null : groupKey;
+    setSelectedPlatformGroup(newGroup);
+    loadGames(selectedGenre, newGroup);
   };
 
   const renderGenreItem = ({ item }: { item: Genre }) => (
     <TouchableOpacity
       style={[
-        styles.genreChip,
-        selectedGenre === item.id && styles.genreChipSelected
+        styles.filterChip,
+        selectedGenre === item.id && styles.filterChipSelected
       ]}
       onPress={() => handleGenreSelect(item.id)}
     >
       <Text style={[
-        styles.genreText,
-        selectedGenre === item.id && styles.genreTextSelected
+        styles.filterText,
+        selectedGenre === item.id && styles.filterTextSelected
       ]}>
         {item.name}
       </Text>
     </TouchableOpacity>
   );
 
-  const renderItem = ({ item }: { item: Game }) => (
-    <View style={styles.card}>
+  const renderPlatformGroupItem = ({ item }: { item: PlatformGroup }) => (
+    <TouchableOpacity
+      style={[
+        styles.filterChip,
+        selectedPlatformGroup === item.groupKey && styles.filterChipSelected
+      ]}
+      onPress={() => handlePlatformGroupSelect(item.groupKey)}
+    >
+      <Text style={[
+        styles.filterText,
+        selectedPlatformGroup === item.groupKey && styles.filterTextSelected
+      ]}>
+        {item.displayName}
+      </Text>
+    </TouchableOpacity>
+  );
+
+  const renderGame = ({ item }: { item: Game }) => (
+    <TouchableOpacity style={styles.card}>
       {item.cover ? (
         <Image
           source={{ uri: `https:${item.cover.url.replace('t_thumb', 't_cover_big')}` }}
@@ -79,31 +140,64 @@ export default function App() {
       )}
       <View style={styles.info}>
         <Text style={styles.title}>{item.name}</Text>
-        {item.rating && (
-          <Text style={styles.rating}>Rating: {Math.round(item.rating)}</Text>
-        )}
+        {item.rating && <Text style={styles.rating}>Rating: {Math.round(item.rating)}</Text>}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Game List</Text>
+
+      <Text style={styles.headerTitle}>My Game List</Text>
+
+      {/* FILTER TABS */}
+      <View style={styles.filterTypeContainer}>
+        <TouchableOpacity
+          style={[styles.filterTypeButton, activeFilterType === 'GENRE' && styles.filterTypeButtonActive]}
+          onPress={() => setActiveFilterType('GENRE')}
+        >
+          <Text style={[styles.filterTypeText, activeFilterType === 'GENRE' && styles.filterTypeTextActive]}>
+            Genres
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.filterTypeButton, activeFilterType === 'PLATFORM' && styles.filterTypeButtonActive]}
+          onPress={() => setActiveFilterType('PLATFORM')}
+        >
+          <Text style={[styles.filterTypeText, activeFilterType === 'PLATFORM' && styles.filterTypeTextActive]}>
+            Platforms
+          </Text>
+        </TouchableOpacity>
       </View>
 
-      <View style={styles.genreContainer}>
-        <FlatList
-          data={genres}
-          renderItem={renderGenreItem}
-          keyExtractor={(item) => item.id.toString()}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.genreList}
-        />
+      {/* FILTER LIST */}
+      <View style={styles.filterListContainer}>
+        {activeFilterType === 'GENRE' && (
+          <FlatList
+            data={genres}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            renderItem={renderGenreItem}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={styles.filterList}
+          />
+        )}
+
+        {activeFilterType === 'PLATFORM' && (
+          <FlatList
+            data={platformGroups}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            renderItem={renderPlatformGroupItem}
+            keyExtractor={(item) => item.groupKey}
+            contentContainerStyle={styles.filterList}
+          />
+        )}
       </View>
 
+      {/* GAME LIST */}
       {loading ? (
         <View style={styles.center}>
           <ActivityIndicator size="large" color="#6441a5" />
@@ -112,12 +206,11 @@ export default function App() {
       ) : error ? (
         <View style={styles.center}>
           <Text style={styles.errorText}>{error}</Text>
-          <Text style={styles.retryButton} onPress={() => loadGames(selectedGenre)}>Retry</Text>
         </View>
       ) : (
         <FlatList
           data={games}
-          renderItem={renderItem}
+          renderItem={renderGame}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.list}
         />
@@ -125,7 +218,6 @@ export default function App() {
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -142,16 +234,39 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
   },
-  genreContainer: {
+  filterTypeContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    paddingTop: 10,
+  },
+  filterTypeButton: {
+    marginRight: 20,
+    paddingBottom: 10,
+  },
+  filterTypeButtonActive: {
+    borderBottomWidth: 2,
+    borderBottomColor: '#6441a5',
+  },
+  filterTypeText: {
+    fontSize: 16,
+    color: '#666',
+    fontWeight: '600',
+  },
+  filterTypeTextActive: {
+    color: '#6441a5',
+  },
+  filterListContainer: {
     backgroundColor: '#fff',
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+    height: 60,
   },
-  genreList: {
+  filterList: {
     paddingHorizontal: 16,
   },
-  genreChip: {
+  filterChip: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     backgroundColor: '#f0f0f0',
@@ -160,15 +275,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
   },
-  genreChipSelected: {
+  filterChipSelected: {
     backgroundColor: '#6441a5',
     borderColor: '#6441a5',
   },
-  genreText: {
+  filterText: {
     color: '#333',
     fontWeight: '600',
   },
-  genreTextSelected: {
+  filterTextSelected: {
     color: '#fff',
   },
   list: {
