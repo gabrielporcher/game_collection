@@ -4,12 +4,9 @@ import {
   Text,
   View,
   FlatList,
-  SafeAreaView,
-  StatusBar,
   ActivityIndicator,
-  TouchableOpacity,
 } from "react-native";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   fetchGames,
   fetchGenres,
@@ -22,8 +19,7 @@ import { SearchInput } from "@/src/components/SearchInput";
 import { GameCard } from "@/src/components/GameCard";
 import { Colors } from "@/src/constants/Colors";
 import { Spacing, Typography, BorderRadius } from "@/src/constants/Theme";
-
-type FilterType = "GENRE" | "PLATFORM";
+import { FilterChip } from "@/src/components/FilterChip";
 
 export default function App() {
   const [games, setGames] = useState<Game[]>([]);
@@ -107,64 +103,21 @@ export default function App() {
     }
   };
 
-  // GENRE FILTER
   const handleGenreSelect = (genreId: number) => {
     const newGenre = selectedGenre === genreId ? null : genreId;
     setSelectedGenre(newGenre);
     loadGames(newGenre, selectedPlatformGroup, searchQuery);
   };
 
-  // PLATFORM GROUP FILTER
   const handlePlatformGroupSelect = (groupKey: string) => {
     const newGroup = selectedPlatformGroup === groupKey ? null : groupKey;
     setSelectedPlatformGroup(newGroup);
     loadGames(selectedGenre, newGroup, searchQuery);
   };
 
-  const renderGenreItem = ({ item }: { item: Genre }) => (
-    <TouchableOpacity
-      style={[
-        styles.filterChip,
-        selectedGenre === item.id && styles.filterChipSelected,
-      ]}
-      onPress={() => handleGenreSelect(item.id)}
-    >
-      <Text
-        style={[
-          styles.filterText,
-          selectedGenre === item.id && styles.filterTextSelected,
-        ]}
-      >
-        {item.name}
-      </Text>
-    </TouchableOpacity>
-  );
-
-  const renderPlatformGroupItem = ({ item }: { item: PlatformGroup }) => (
-    <TouchableOpacity
-      style={[
-        styles.filterChip,
-        selectedPlatformGroup === item.groupKey && styles.filterChipSelected,
-      ]}
-      onPress={() => handlePlatformGroupSelect(item.groupKey)}
-    >
-      <Text
-        style={[
-          styles.filterText,
-          selectedPlatformGroup === item.groupKey && styles.filterTextSelected,
-        ]}
-      >
-        {item.displayName}
-      </Text>
-    </TouchableOpacity>
-  );
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>GAMELIB</Text>
-
-        {/* SEARCH BAR */}
         <SearchInput
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -180,7 +133,13 @@ export default function App() {
               data={platformGroups}
               horizontal
               showsHorizontalScrollIndicator={false}
-              renderItem={renderPlatformGroupItem}
+              renderItem={({ item }) => (
+                <FilterChip
+                  item={item}
+                  onPress={() => handlePlatformGroupSelect(item.groupKey)}
+                  isSelected={selectedPlatformGroup === item.groupKey}
+                />
+              )}
               keyExtractor={(item) => item.groupKey}
               contentContainerStyle={styles.filterList}
               style={styles.filterListContainer}
@@ -191,7 +150,13 @@ export default function App() {
               data={genres}
               horizontal
               showsHorizontalScrollIndicator={false}
-              renderItem={renderGenreItem}
+              renderItem={({ item }) => (
+                <FilterChip
+                  item={item}
+                  onPress={() => handleGenreSelect(item.id)}
+                  isSelected={selectedGenre === item.id}
+                />
+              )}
               keyExtractor={(item) => item.id.toString()}
               contentContainerStyle={styles.filterList}
               style={styles.filterListContainer}
@@ -201,7 +166,7 @@ export default function App() {
       </View>
 
       {/* GAME LIST */}
-      {loading && games.length === 0 ? (
+      {loading ? (
         <View style={styles.center}>
           <ActivityIndicator size="large" color={Colors.dark.primary} />
           <Text style={styles.loadingText}>Loading...</Text>
@@ -265,31 +230,10 @@ const styles = StyleSheet.create({
   filterList: {
     paddingRight: Spacing.md,
   },
-  filterChip: {
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs,
-    backgroundColor: Colors.dark.surface,
-    borderRadius: BorderRadius.round,
-    marginRight: Spacing.sm,
-    borderWidth: 1,
-    borderColor: Colors.dark.border,
-  },
-  filterChipSelected: {
-    backgroundColor: Colors.dark.primary,
-    borderColor: Colors.dark.primary,
-  },
-  filterText: {
-    color: Colors.dark.text,
-    fontSize: Typography.size.sm,
-    fontWeight: "500",
-  },
-  filterTextSelected: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
   list: {
     padding: Spacing.md,
     paddingTop: 0,
+    paddingBottom: 100,
   },
   columnWrapper: {
     justifyContent: "space-between",

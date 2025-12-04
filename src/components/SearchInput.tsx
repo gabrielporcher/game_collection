@@ -25,20 +25,22 @@ export function SearchInput({
 }: SearchInputProps) {
   return (
     <View style={[styles.container, style]}>
-      <Ionicons
-        name="search"
-        size={20}
-        color={Colors.dark.textSecondary}
-        style={styles.searchIcon}
-      />
-      <TextInput
-        style={styles.input}
-        value={value}
-        onChangeText={onChangeText}
-        placeholder="Search for games..."
-        placeholderTextColor={Colors.dark.textSecondary}
-        returnKeyType="search"
-      />
+      <View style={styles.inputContainer}>
+        <Ionicons
+          name="search"
+          size={20}
+          color={Colors.dark.textSecondary}
+          style={styles.searchIcon}
+        />
+        <TextInput
+          style={styles.input}
+          value={value}
+          onChangeText={onChangeText}
+          placeholder="Search for games..."
+          placeholderTextColor={Colors.dark.textSecondary}
+          returnKeyType="search"
+        />
+      </View>
       <TouchableOpacity onPress={onFilterPress} style={styles.filterButton}>
         <Ionicons name="options" size={20} color={Colors.dark.text} />
       </TouchableOpacity>
@@ -50,11 +52,17 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
+    gap: Spacing.sm,
+  },
+  inputContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: Colors.dark.surface,
     borderRadius: BorderRadius.round,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
-    //height: 50,
+    height: 55,
   },
   searchIcon: {
     marginRight: Spacing.sm,
@@ -63,15 +71,13 @@ const styles = StyleSheet.create({
     flex: 1,
     color: Colors.dark.text,
     fontSize: Typography.size.md,
-    fontFamily: "Inter", // Assuming Inter or system font
+    fontFamily: "Inter",
   },
   filterButton: {
-    padding: Spacing.xs,
-    marginLeft: Spacing.sm,
-    backgroundColor: Colors.dark.border, // Slightly lighter than surface for contrast? Or just transparent
+    backgroundColor: Colors.dark.surface,
     borderRadius: BorderRadius.round,
-    width: 36,
-    height: 36,
+    width: 55,
+    height: 55,
     justifyContent: "center",
     alignItems: "center",
   },
