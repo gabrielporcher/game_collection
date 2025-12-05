@@ -33,7 +33,11 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
 
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
 
@@ -47,7 +51,7 @@ export default function App() {
     const timer = setTimeout(() => {
       // Only load if we are not in the initial loading state (or if we have data)
       if (!loading || games.length > 0) {
-        loadGames(selectedGenre, selectedPlatformGroup, searchQuery);
+        loadGames(selectedGenre, selectedPlatformGroup, searchQuery, true);
       }
     }, 500);
 
@@ -65,6 +69,7 @@ export default function App() {
       setGames(gamesData);
       setGenres(genresData);
       setPlatformGroups(platformsData);
+      setOffset(20); // Initialize offset for next page
     } catch {
       setError("Failed to load data.");
     } finally {
@@ -75,10 +80,20 @@ export default function App() {
   const loadGames = async (
     genreId?: number | null,
     platformGroupKey?: string | null,
-    query?: string
+    query?: string,
+    reset: boolean = false
   ) => {
     try {
-      setLoading(true);
+      if (reset) {
+        setLoading(true);
+        setOffset(0);
+        setHasMore(true);
+      } else {
+        setLoadingMore(true);
+      }
+
+      const currentOffset = reset ? 0 : offset;
+      const limit = 20;
 
       const platformIds = platformGroupKey
         ? platformGroups.find((g) => g.groupKey === platformGroupKey)?.ids || []
@@ -92,27 +107,46 @@ export default function App() {
           ? platformGroups.find((g) => g.groupKey === selectedPlatformGroup)
               ?.ids || []
           : [],
-        query !== undefined ? query : searchQuery
+        query !== undefined ? query : searchQuery,
+        limit,
+        currentOffset
       );
 
-      setGames(data);
+      if (data.length < limit) {
+        setHasMore(false);
+      }
+
+      if (reset) {
+        setGames(data);
+      } else {
+        setGames((prev) => [...prev, ...data]);
+      }
+
+      setOffset(currentOffset + limit);
     } catch {
       setError("Failed to load games.");
     } finally {
       setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  const handleLoadMore = () => {
+    if (!loading && !loadingMore && hasMore) {
+      loadGames(selectedGenre, selectedPlatformGroup, searchQuery, false);
     }
   };
 
   const handleGenreSelect = (genreId: number) => {
     const newGenre = selectedGenre === genreId ? null : genreId;
     setSelectedGenre(newGenre);
-    loadGames(newGenre, selectedPlatformGroup, searchQuery);
+    loadGames(newGenre, selectedPlatformGroup, searchQuery, true);
   };
 
   const handlePlatformGroupSelect = (groupKey: string) => {
     const newGroup = selectedPlatformGroup === groupKey ? null : groupKey;
     setSelectedPlatformGroup(newGroup);
-    loadGames(selectedGenre, newGroup, searchQuery);
+    loadGames(selectedGenre, newGroup, searchQuery, true);
   };
 
   return (
@@ -186,6 +220,15 @@ export default function App() {
           numColumns={2}
           columnWrapperStyle={styles.columnWrapper}
           showsVerticalScrollIndicator={false}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            loadingMore ? (
+              <View style={styles.footerLoader}>
+                <ActivityIndicator size="small" color={Colors.dark.primary} />
+              </View>
+            ) : null
+          }
         />
       )}
     </SafeAreaView>
@@ -250,5 +293,9 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     marginBottom: Spacing.sm,
+  },
+  footerLoader: {
+    paddingVertical: Spacing.md,
+    alignItems: "center",
   },
 });

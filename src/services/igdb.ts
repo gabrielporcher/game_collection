@@ -103,7 +103,9 @@ export const fetchPlatforms = async (): Promise<PlatformGroup[]> => {
 export const fetchGames = async (
   genreId?: number | null,
   platformIds?: number[] | null,
-  searchQuery?: string
+  searchQuery?: string,
+  limit: number = 20,
+  offset: number = 0
 ): Promise<Game[]> => {
   const token = await getAccessToken();
   if (!token) throw new Error("No access token available");
@@ -111,7 +113,8 @@ export const fetchGames = async (
   let query = `
     fields name, cover.url, rating, total_rating_count, game_type, platforms;
     sort total_rating_count desc;
-    limit 30;
+    limit ${limit};
+    offset ${offset};
   `;
 
   const conditions: string[] = [];
