@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity, Text } from "react-native";
-import { Spacing, BorderRadius, Typography } from "../constants/Theme";
+import { Spacing, BorderRadius, TextVariants } from "../constants/Theme";
 import { Colors } from "../constants/Colors";
 
 import { PlatformGroup, Genre } from "../services/igdb";
@@ -19,11 +19,7 @@ export function FilterChip({ item, onPress, isSelected }: FilterChipProps) {
       style={[styles.filterChip, isSelected && styles.filterChipSelected]}
       onPress={onPress}
     >
-      <Text
-        style={[styles.filterText, isSelected && styles.filterTextSelected]}
-      >
-        {label}
-      </Text>
+      <Text style={TextVariants.chip}>{label}</Text>
     </TouchableOpacity>
   );
 }
@@ -41,14 +37,5 @@ const styles = StyleSheet.create({
   filterChipSelected: {
     backgroundColor: Colors.dark.primary,
     borderColor: Colors.dark.primary,
-  },
-  filterText: {
-    color: Colors.dark.text,
-    fontSize: Typography.size.sm,
-    fontWeight: "500",
-  },
-  filterTextSelected: {
-    color: "#fff",
-    fontWeight: "bold",
   },
 });

@@ -11,7 +11,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Game, PLATFORM_GROUPS } from "../services/igdb";
 import { Colors } from "../constants/Colors";
-import { BorderRadius, Spacing, Typography } from "../constants/Theme";
+import { BorderRadius, Spacing, TextVariants } from "../constants/Theme";
 
 interface GameCardProps {
   game: Game;
@@ -94,16 +94,14 @@ export function GameCard({ game, onPress }: GameCardProps) {
         colors={["transparent", "rgba(0,0,0,0.9)"]}
         style={styles.overlay}
       >
-        <View style={styles.header}>{/* Platform icons top right */}</View>
-
         <View style={styles.footer}>
-          <Text style={styles.title} numberOfLines={2}>
+          <Text style={TextVariants.cardTitle} numberOfLines={2}>
             {game.name}
           </Text>
         </View>
       </LinearGradient>
 
-      {/* Absolute positioned platform icons */}
+      {/*platform icons */}
       <View style={styles.topRight}>{renderPlatformIcons()}</View>
     </TouchableOpacity>
   );
@@ -137,19 +135,8 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     padding: Spacing.sm,
   },
-  header: {
-    flex: 1,
-  },
   footer: {
     justifyContent: "flex-end",
-  },
-  title: {
-    color: Colors.dark.text,
-    fontSize: Typography.size.md,
-    fontWeight: "bold",
-    textShadowColor: "rgba(0, 0, 0, 0.75)",
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
   },
   topRight: {
     position: "absolute",

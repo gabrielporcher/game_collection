@@ -6,9 +6,13 @@ import Animated, {
   useAnimatedStyle,
   useScrollViewOffset,
 } from "react-native-reanimated";
-
-import { View } from "react-native";
+import { TouchableOpacity, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { TextVariants, BorderRadius } from "../constants/Theme";
 import { Colors } from "../constants/Colors";
+import { Screen } from "./Screen";
 
 const HEADER_HEIGHT = 300;
 
@@ -23,6 +27,8 @@ export default function ParallaxScrollView({
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useScrollViewOffset(scrollRef);
   const bottom = 0;
+  const { top } = useSafeAreaInsets();
+  const router = useRouter();
 
   const headerAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -46,7 +52,7 @@ export default function ParallaxScrollView({
   });
 
   return (
-    <View style={styles.container}>
+    <Screen padless>
       <Animated.ScrollView
         ref={scrollRef}
         scrollEventThrottle={16}
@@ -64,14 +70,18 @@ export default function ParallaxScrollView({
         </Animated.View>
         <View style={styles.content}>{children}</View>
       </Animated.ScrollView>
-    </View>
+      <TouchableOpacity
+        onPress={() => router.back()}
+        style={[styles.backButton, { top: top }]}
+      >
+        <Ionicons name="arrow-back" size={24} color={Colors.dark.primary} />
+        <Text style={TextVariants.text}>Voltar</Text>
+      </TouchableOpacity>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   header: {
     height: HEADER_HEIGHT,
     overflow: "hidden",
@@ -79,8 +89,18 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 32,
-    gap: 16,
+    padding: 20,
+    gap: 10,
     overflow: "hidden",
+  },
+  backButton: {
+    position: "absolute",
+    flexDirection: "row",
+    padding: 5,
+    left: 2,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    borderRadius: BorderRadius.sm,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

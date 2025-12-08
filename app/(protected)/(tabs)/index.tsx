@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Screen } from "@/src/components/Screen";
 import { useRouter } from "expo-router";
 import {
   fetchGames,
@@ -19,8 +20,7 @@ import {
 import { SearchInput } from "@/src/components/SearchInput";
 import { GameCard } from "@/src/components/GameCard";
 import { Colors } from "@/src/constants/Colors";
-import { Spacing, Typography, BorderRadius } from "@/src/constants/Theme";
-import { FilterChip } from "@/src/components/FilterChip";
+import { Spacing, Typography, TextVariants } from "@/src/constants/Theme";
 
 export default function App() {
   const [games, setGames] = useState<Game[]>([]);
@@ -153,7 +153,7 @@ export default function App() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <Screen>
       <View style={styles.header}>
         <SearchInput
           value={searchQuery}
@@ -166,7 +166,6 @@ export default function App() {
           onGenrePress={(id) => handleGenreSelect(id)}
           selectedPlatformGroup={selectedPlatformGroup}
           selectedGenre={selectedGenre}
-          style={styles.searchInput}
         />
       </View>
 
@@ -174,11 +173,11 @@ export default function App() {
       {loading ? (
         <View style={styles.center}>
           <ActivityIndicator size="large" color={Colors.dark.primary} />
-          <Text style={styles.loadingText}>Loading...</Text>
+          <Text style={TextVariants.text}>Loading...</Text>
         </View>
       ) : error && games.length === 0 ? (
         <View style={styles.center}>
-          <Text style={styles.errorText}>{error}</Text>
+          <Text style={TextVariants.text}>{error}</Text>
         </View>
       ) : (
         <FlatList
@@ -220,44 +219,16 @@ export default function App() {
           }
         />
       )}
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.dark.background,
-  },
   header: {
-    padding: Spacing.md,
-    backgroundColor: Colors.dark.background,
-    zIndex: 1,
-  },
-
-  searchInput: {
-    marginBottom: Spacing.sm,
-  },
-  expandedFilters: {
-    marginTop: Spacing.sm,
-  },
-  filterSectionTitle: {
-    color: Colors.dark.textSecondary,
-    fontSize: Typography.size.sm,
-    fontWeight: "600",
-    marginBottom: Spacing.xs,
-    marginTop: Spacing.sm,
-    marginLeft: Spacing.xs,
-  },
-  filterListContainer: {
-    marginBottom: Spacing.xs,
-  },
-  filterList: {
-    paddingRight: Spacing.md,
+    zIndex: 10,
+    marginBottom: 10,
   },
   list: {
-    padding: Spacing.md,
-    paddingTop: 0,
     paddingBottom: 100,
   },
   columnWrapper: {
@@ -267,14 +238,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  loadingText: {
-    marginTop: Spacing.sm,
-    color: Colors.dark.textSecondary,
-  },
-  errorText: {
-    color: "red",
-    marginBottom: Spacing.sm,
   },
   footerLoader: {
     paddingVertical: Spacing.md,

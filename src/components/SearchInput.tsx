@@ -11,7 +11,12 @@ import {
 import { FilterChip } from "./FilterChip";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../constants/Colors";
-import { BorderRadius, Spacing, Typography } from "../constants/Theme";
+import {
+  BorderRadius,
+  Spacing,
+  Typography,
+  TextVariants,
+} from "../constants/Theme";
 import { PlatformGroup, Genre } from "../services/igdb";
 
 interface SearchInputProps {
@@ -52,7 +57,7 @@ export function SearchInput({
             style={styles.searchIcon}
           />
           <TextInput
-            style={styles.input}
+            style={TextVariants.textInput}
             value={value}
             onChangeText={onChangeText}
             placeholder="Search for games..."
@@ -66,7 +71,7 @@ export function SearchInput({
       </View>
       {isFilterExpanded && (
         <View style={styles.expandedFilters}>
-          <Text style={styles.filterSectionTitle}>Platforms</Text>
+          <Text style={TextVariants.chipSectionTitle}>Platforms</Text>
           <FlatList
             data={platformGroups}
             horizontal
@@ -79,11 +84,9 @@ export function SearchInput({
               />
             )}
             keyExtractor={(item) => item.groupKey}
-            contentContainerStyle={styles.filterList}
-            style={styles.filterListContainer}
           />
 
-          <Text style={styles.filterSectionTitle}>Genres</Text>
+          <Text style={TextVariants.chipSectionTitle}>Genres</Text>
           <FlatList
             data={genres}
             horizontal
@@ -96,8 +99,6 @@ export function SearchInput({
               />
             )}
             keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={styles.filterList}
-            style={styles.filterListContainer}
           />
         </View>
       )}
@@ -125,10 +126,10 @@ const styles = StyleSheet.create({
     marginRight: Spacing.sm,
   },
   input: {
-    flex: 1,
+    //flex: 1,
     color: Colors.dark.text,
     fontSize: Typography.size.md,
-    fontFamily: "Inter",
+    //fontFamily: "Inter",
   },
   filterButton: {
     backgroundColor: Colors.dark.surface,
@@ -140,19 +141,6 @@ const styles = StyleSheet.create({
   },
   expandedFilters: {
     marginTop: Spacing.sm,
-  },
-  filterSectionTitle: {
-    color: Colors.dark.textSecondary,
-    fontSize: Typography.size.sm,
-    fontWeight: "600",
-    marginBottom: Spacing.xs,
-    marginTop: Spacing.sm,
-    marginLeft: Spacing.xs,
-  },
-  filterListContainer: {
-    marginBottom: Spacing.xs,
-  },
-  filterList: {
-    paddingRight: Spacing.md,
+    gap: Spacing.sm,
   },
 });

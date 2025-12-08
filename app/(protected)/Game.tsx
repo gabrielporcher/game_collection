@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, Image } from "react-native";
 import ParallaxScrollView from "@/src/components/ParallaxScrollView";
 import { useLocalSearchParams } from "expo-router";
+import { TextVariants } from "@/src/constants/Theme";
 
 export default function GameScreen() {
   const { name, cover, rating, storyline, platforms, summary } =
@@ -20,9 +21,9 @@ export default function GameScreen() {
         />
       }
     >
-      <Text style={{ fontSize: 24, fontWeight: "bold" }}>{name}</Text>
-      <Text style={{ fontSize: 16 }}>{storyline}</Text>
-      <Text style={{ fontSize: 16 }}>{summary}</Text>
+      <Text style={TextVariants.title}>{name}</Text>
+      <Text style={TextVariants.text}>{storyline}</Text>
+      <Text style={TextVariants.text}>{summary}</Text>
     </ParallaxScrollView>
   );
 }
