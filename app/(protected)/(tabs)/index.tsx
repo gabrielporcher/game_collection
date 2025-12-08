@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 import {
   fetchGames,
   fetchGenres,
@@ -40,6 +41,8 @@ export default function App() {
   const [hasMore, setHasMore] = useState(true);
 
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
+
+  const router = useRouter();
 
   // INITIAL LOAD
   useEffect(() => {
@@ -156,47 +159,15 @@ export default function App() {
           value={searchQuery}
           onChangeText={setSearchQuery}
           onFilterPress={() => setIsFilterExpanded(!isFilterExpanded)}
+          isFilterExpanded={isFilterExpanded}
+          platformGroups={platformGroups}
+          genres={genres}
+          onPlatformPress={(key) => handlePlatformGroupSelect(key)}
+          onGenrePress={(id) => handleGenreSelect(id)}
+          selectedPlatformGroup={selectedPlatformGroup}
+          selectedGenre={selectedGenre}
           style={styles.searchInput}
         />
-
-        {/* EXPANDABLE FILTERS */}
-        {isFilterExpanded && (
-          <View style={styles.expandedFilters}>
-            <Text style={styles.filterSectionTitle}>Platforms</Text>
-            <FlatList
-              data={platformGroups}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              renderItem={({ item }) => (
-                <FilterChip
-                  item={item}
-                  onPress={() => handlePlatformGroupSelect(item.groupKey)}
-                  isSelected={selectedPlatformGroup === item.groupKey}
-                />
-              )}
-              keyExtractor={(item) => item.groupKey}
-              contentContainerStyle={styles.filterList}
-              style={styles.filterListContainer}
-            />
-
-            <Text style={styles.filterSectionTitle}>Genres</Text>
-            <FlatList
-              data={genres}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              renderItem={({ item }) => (
-                <FilterChip
-                  item={item}
-                  onPress={() => handleGenreSelect(item.id)}
-                  isSelected={selectedGenre === item.id}
-                />
-              )}
-              keyExtractor={(item) => item.id.toString()}
-              contentContainerStyle={styles.filterList}
-              style={styles.filterListContainer}
-            />
-          </View>
-        )}
       </View>
 
       {/* GAME LIST */}
@@ -213,7 +184,25 @@ export default function App() {
         <FlatList
           data={games}
           renderItem={({ item }) => (
-            <GameCard game={item} onPress={() => console.log(item)} />
+            <GameCard
+              game={item}
+              onPress={() =>
+                router.navigate({
+                  pathname: "/Game",
+                  params: {
+                    id: item.id,
+                    name: item.name,
+                    cover: item.cover?.url,
+                    rating: item.rating,
+                    summary: item.summary,
+                    storyline: item.storyline,
+                    platforms: item.platforms,
+                    genres: item.genres,
+                    multiplayer_modes: item.multiplayer_modes,
+                  },
+                })
+              }
+            />
           )}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.list}
@@ -245,14 +234,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.dark.background,
     zIndex: 1,
   },
-  headerTitle: {
-    fontSize: Typography.size.xl,
-    fontWeight: "bold",
-    color: Colors.dark.text,
-    marginBottom: Spacing.md,
-    textAlign: "center",
-    letterSpacing: 1,
-  },
+
   searchInput: {
     marginBottom: Spacing.sm,
   },

@@ -12,6 +12,10 @@ export interface Game {
   };
   rating?: number;
   platforms?: number[];
+  genres?: number[];
+  multiplayer_modes?: number[];
+  summary?: string;
+  storyline?: string;
 }
 
 export interface Genre {
@@ -111,7 +115,7 @@ export const fetchGames = async (
   if (!token) throw new Error("No access token available");
 
   let query = `
-    fields name, cover.url, rating, total_rating_count, game_type, platforms;
+    fields name, cover.url, rating, total_rating_count, game_type, platforms, genres, multiplayer_modes, summary, storyline;
     sort total_rating_count desc;
     limit ${limit};
     offset ${offset};
