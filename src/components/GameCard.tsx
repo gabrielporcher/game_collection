@@ -22,48 +22,50 @@ const { width } = Dimensions.get("window");
 const CARD_WIDTH = (width - Spacing.md * 3) / 2; // 2 columns with padding
 const CARD_HEIGHT = CARD_WIDTH * 1.3; // Aspect ratio ~3:4
 
-export function GameCard({ game, onPress }: GameCardProps) {
-  const renderPlatformIcons = () => {
-    if (!game.platforms) return null;
+export const renderPlatformIcons = (game: Game, big = false) => {
+  if (!game.platforms) return null;
 
-    const icons: React.ReactNode[] = [];
-    const renderedGroups = new Set<string>();
+  const icons: React.ReactNode[] = [];
+  const renderedGroups = new Set<string>();
 
-    // Map groups to icons
-    const groupIcons: Record<
-      string,
-      { name: keyof typeof MaterialCommunityIcons.glyphMap; color: string }
-    > = {
-      playstation: { name: "sony-playstation", color: "#fff" },
-      xbox: { name: "microsoft-xbox", color: "#fff" },
-      nintendo: { name: "nintendo-switch", color: "#fff" },
-      pc: { name: "monitor", color: "#fff" },
-      mobile: { name: "cellphone", color: "#fff" },
-      sega: { name: "alpha-s-box-outline", color: "#fff" },
-    };
-
-    // Check each group
-    for (const [groupKey, ids] of Object.entries(PLATFORM_GROUPS)) {
-      // If the game has any platform from this group
-      if (game.platforms.some((pId) => ids.includes(pId))) {
-        if (!renderedGroups.has(groupKey) && groupIcons[groupKey]) {
-          renderedGroups.add(groupKey);
-          icons.push(
-            <MaterialCommunityIcons
-              key={groupKey}
-              name={groupIcons[groupKey].name}
-              size={12}
-              color={groupIcons[groupKey].color}
-              style={styles.icon}
-            />
-          );
-        }
-      }
-    }
-
-    return <View style={styles.platformIcons}>{icons}</View>;
+  // Map groups to icons
+  const groupIcons: Record<
+    string,
+    { name: keyof typeof MaterialCommunityIcons.glyphMap; color: string }
+  > = {
+    playstation: { name: "sony-playstation", color: "#fff" },
+    xbox: { name: "microsoft-xbox", color: "#fff" },
+    nintendo: { name: "nintendo-switch", color: "#fff" },
+    pc: { name: "monitor", color: "#fff" },
+    mobile: { name: "cellphone", color: "#fff" },
+    sega: { name: "alpha-s-box-outline", color: "#fff" },
   };
 
+  // Check each group
+  for (const [groupKey, ids] of Object.entries(PLATFORM_GROUPS)) {
+    // If the game has any platform from this group
+    if (game.platforms.some((pId) => ids.includes(pId))) {
+      if (!renderedGroups.has(groupKey) && groupIcons[groupKey]) {
+        renderedGroups.add(groupKey);
+        icons.push(
+          <MaterialCommunityIcons
+            key={groupKey}
+            name={groupIcons[groupKey].name}
+            size={big ? 24 : 12}
+            color={groupIcons[groupKey].color}
+            style={styles.icon}
+          />
+        );
+      }
+    }
+  }
+
+  return (
+    <View style={[styles.platformIcons, { gap: big ? 12 : 4 }]}>{icons}</View>
+  );
+};
+
+export function GameCard({ game, onPress }: GameCardProps) {
   const imageUrl = game.cover
     ? `https:${game.cover.url.replace("t_thumb", "t_cover_big")}`
     : null;
@@ -102,7 +104,7 @@ export function GameCard({ game, onPress }: GameCardProps) {
       </LinearGradient>
 
       {/*platform icons */}
-      <View style={styles.topRight}>{renderPlatformIcons()}</View>
+      <View style={styles.topRight}>{renderPlatformIcons(game)}</View>
     </TouchableOpacity>
   );
 }
@@ -149,7 +151,7 @@ const styles = StyleSheet.create({
   },
   platformIcons: {
     flexDirection: "row",
-    gap: 4,
+    //gap: 4,
   },
   icon: {
     marginLeft: 2,

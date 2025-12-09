@@ -36,11 +36,11 @@ export interface PlatformGroup {
 }
 
 export const PLATFORM_GROUPS: Record<string, number[]> = {
+  pc: [6, 13, 14, 3], // Windows, DOS, Mac, Linux
   playstation: [7, 8, 9, 48, 167], // PS1 → PS5
   xbox: [11, 12, 49, 169], // Xbox → Series X|S
   nintendo: [4, 18, 21, 130, 508, 5, 41], // N64, NES, GameCube, Switch...
   sega: [30, 78, 35, 64, 29, 32, 84], // Sega family
-  pc: [6, 13, 14, 3], // Windows, DOS, Mac, Linux
   mobile: [39, 34, 73, 74], // iOS, Android
   handheld: [33, 24, 22, 37, 20, 119, 120], // Game Boy → 3DS
 };
@@ -71,7 +71,7 @@ export const fetchGenres = async (): Promise<Genre[]> => {
 
   const response = await axios.post(
     "https://api.igdb.com/v4/genres",
-    "fields name, slug; limit 50;",
+    "fields name, slug; limit 200; sort name asc;",
     {
       headers: {
         "Client-ID": CLIENT_ID,
@@ -147,6 +147,5 @@ export const fetchGames = async (
       "Content-Type": "text/plain",
     },
   });
-
   return response.data;
 };

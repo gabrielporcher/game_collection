@@ -152,6 +152,15 @@ export default function App() {
     loadGames(selectedGenre, newGroup, searchQuery, true);
   };
 
+  const getGenresNames = (genreIds: number[] | undefined) => {
+    if (!genreIds) return [];
+    const genresNames = genreIds.map(
+      (id) => genres.find((g) => g.id === id)?.name
+    );
+
+    return JSON.stringify(genresNames);
+  };
+
   return (
     <Screen>
       <View style={styles.header}>
@@ -189,15 +198,10 @@ export default function App() {
                 router.navigate({
                   pathname: "/Game",
                   params: {
-                    id: item.id,
                     name: item.name,
                     cover: item.cover?.url,
-                    rating: item.rating,
-                    summary: item.summary,
-                    storyline: item.storyline,
-                    platforms: item.platforms,
-                    genres: item.genres,
-                    multiplayer_modes: item.multiplayer_modes,
+                    genres: getGenresNames(item.genres),
+                    game: JSON.stringify(item),
                   },
                 })
               }
@@ -235,9 +239,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   center: {
-    flex: 1,
+    //flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    height: "100%",
   },
   footerLoader: {
     paddingVertical: Spacing.md,

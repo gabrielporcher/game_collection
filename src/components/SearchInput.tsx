@@ -57,7 +57,7 @@ export function SearchInput({
             style={styles.searchIcon}
           />
           <TextInput
-            style={TextVariants.textInput}
+            style={styles.textInput}
             value={value}
             onChangeText={onChangeText}
             placeholder="Search for games..."
@@ -111,6 +111,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: Spacing.sm,
+  },
+  textInput: {
+    flex: 1,
+    ...TextVariants.textInput,
   },
   inputContainer: {
     flex: 1,

@@ -1,26 +1,39 @@
 import React from "react";
-import { StyleSheet, TouchableOpacity, Text } from "react-native";
+import { StyleSheet, TouchableOpacity, Text, View } from "react-native";
 import { Spacing, BorderRadius, TextVariants } from "../constants/Theme";
 import { Colors } from "../constants/Colors";
 
 import { PlatformGroup, Genre } from "../services/igdb";
 
 interface FilterChipProps {
-  item: PlatformGroup | Genre;
-  onPress: () => void;
-  isSelected: boolean;
+  item: PlatformGroup | Genre | string;
+  onPress?: () => void;
+  isSelected?: boolean;
+  unpressable?: boolean;
 }
 
-export function FilterChip({ item, onPress, isSelected }: FilterChipProps) {
-  const label = "groupKey" in item ? item.displayName : item.name;
+export function FilterChip({
+  item,
+  onPress,
+  isSelected,
+  unpressable = false,
+}: FilterChipProps) {
+  const Wrapper = unpressable ? View : TouchableOpacity;
+
+  const label =
+    typeof item === "string"
+      ? item
+      : "groupKey" in item
+      ? item.displayName
+      : item.name;
 
   return (
-    <TouchableOpacity
+    <Wrapper
       style={[styles.filterChip, isSelected && styles.filterChipSelected]}
       onPress={onPress}
     >
       <Text style={TextVariants.chip}>{label}</Text>
-    </TouchableOpacity>
+    </Wrapper>
   );
 }
 
