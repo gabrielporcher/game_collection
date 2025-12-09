@@ -92,6 +92,7 @@ const styles = StyleSheet.create({
     padding: 20,
     gap: 10,
     overflow: "hidden",
+    backgroundColor: Colors.dark.background,
   },
   backButton: {
     position: "absolute",

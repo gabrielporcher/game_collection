@@ -35,6 +35,16 @@ export const TextVariants = {
     fontSize: Typography.size.xl,
     fontWeight: Typography.weight.bold as "700",
   },
+  subtitle: {
+    color: Colors.dark.text,
+    fontSize: Typography.size.lg,
+    fontWeight: Typography.weight.medium as "500",
+  },
+  button: {
+    color: Colors.dark.text,
+    fontSize: Typography.size.md,
+    fontWeight: Typography.weight.bold as "700",
+  },
   cardTitle: {
     color: Colors.dark.text,
     fontSize: Typography.size.md,
@@ -58,6 +68,11 @@ export const TextVariants = {
   },
   chipSectionTitle: {
     color: Colors.dark.textSecondary,
+    fontSize: Typography.size.sm,
+    fontWeight: Typography.weight.medium as "500",
+  },
+  link: {
+    color: Colors.dark.primary,
     fontSize: Typography.size.sm,
     fontWeight: Typography.weight.medium as "500",
   },

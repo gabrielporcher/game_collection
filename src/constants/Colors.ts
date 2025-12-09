@@ -8,5 +8,6 @@ export const Colors = {
     overlay: "rgba(0,0,0,0.7)",
     icon: "#FFFFFF",
     border: "#333333",
+    link: "#4baeffff",
   },
 };
